@@ -1,0 +1,52 @@
+Initializing the 02613 Conda Environment
+To (hopefully) simplify package management, we have set up a shared Anaconda installation and conda environment for the course. To use it, first log on to the node you want to work on (see, e.g., Connecting to an HPC Terminal). Then, run:
+
+source /dtu/projects/02613_2025/conda/conda_init.sh
+
+to activate the shared Anaconda installation (this should still work even if you have previously installed Anaconda on your own). Finally, run:
+
+conda activate 02613
+
+to activate the course conda environment. That should be it! You should now see your prompt has changed to something like (02613) ~@n-62-11-21 $. If you get an error, then see Known Issues at the bottom of this guide.
+
+Update April 2026: For GPU-code and the mini-project, you must active the 02613_2026 environment instead using
+
+conda activate 02613_2026
+
+Note: You must do this every time you change nodes. E.g., if you run this after logging in and then call linuxsh to jump to a work node, you must initialize the conda environment again.
+
+To verify everything has been activated correctly, run:
+
+python -c "import sys; print(sys.executable)" 
+
+This should print "/dtu/projects/02613_2025/conda/miniconda3/envs/02613/bin/python".
+
+In Batch Scripts for bsub
+To use the course conda environment in your batch jobs, add the following two lines to the script after all the #BSUB comments, but before all other commands:
+
+source /dtu/projects/02613_2025/conda/conda_init.sh
+conda activate 02613
+
+Example:
+#!/bin/bash
+#BSUB -J sleeper
+#BSUB -q hpc
+#BSUB -W 2
+#BSUB -R “rusage[mem=512MB]”
+#BSUB -o sleeper_%J.out
+#BSUB -e sleeper_%J.err
+
+source /dtu/projects/02613_2025/conda/conda_init.sh
+conda activate 02613
+
+python -u script.py
+Known Issues
+ModuleNotFound: No module named 'encodings' when running conda activate 02613
+There are two known causes of this:
+
+1. Check the file .bashrc in your home folder (path: ~/.bashrc). If it ends with something similar to:
+# This line below was added by the 10240 setup script
+source /zhome/ab/123456/teaching/autorun/setup_environment.bashrc
+then comment out the last line beginning with source, i.e., add a # to the start of the line. Then, log out, log back in, and try initializing the Conda environment again.
+
+2. Check if you have already loaded the python3 module. This can happen if you manually loaded the module or put it into your ~/.gbarrc file. To check: Run module list. If something like python3/3.XX.YY is listed under Currently Loaded Modulefiles:, the python3 module is loaded, which interferes with conda. To fix it: Run module unload python3 and initialize the course conda environment as normal.

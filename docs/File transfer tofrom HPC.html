@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html><head></head><body style="color: rgb(32, 33, 34); font-family: Verdana; font-size: 12pt;"><h1>File Transfer to/from HPC</h1>
+<p>This document details some different ways to transfer files to/from the DTU HPC cluster. We&nbsp;<em>strongly</em> recommend you use the terminal solutions - it is a great skill to have! However, if you strongly prefer a GUI, we also include a guide for FileZilla.</p>
+<h2>SCP (Terminal)</h2>
+<p>Good for a quick single-file transfer.</p>
+<p><span style="text-decoration: underline;">NOTE:</span> If you are <em>not on DTU wifi</em> you may need to connect with a VPN first or set up ssh keys (see: <a href="https://www.hpc.dtu.dk/?page_id=4317)">https://www.hpc.dtu.dk/?page_id=4317)</a>.</p>
+<p><span style="text-decoration: underline;">NOTE:</span> SCP should be run <span style="text-decoration: underline;">from your own computer,</span> i.e., you should&nbsp;<strong>not</strong> be ssh'ed into the HPC.</p>
+<h3>Transfer: Personal Computer to HPC</h3>
+<p>To transfer a file from your <strong>personal computer to the HPC</strong>, run the following in a terminal on your computer (<strong>not</strong> while ssh'ed into the HPC!):</p>
+<p><code>scp path/to/file.py &lt;username&gt;@login.hpc.dtu.dk:path/to/file.py</code></p>
+<p>Here, <code>&lt;username&gt;</code> is your DTU user name, e.g., your study number. Type in your DTU password and the transfer will begin. The path on HPC is from your zhome folder.&nbsp;</p>
+<p><strong>Example:</strong> Transferring a file from the current folder to a folder on HPC:</p>
+<p><code>scp compute_from_laptop.py &lt;username&gt;@login.hpc.dtu.dk:Documents/02613_PyHPC/compute_from_laptop.py</code></p>
+<h3>Transfer:&nbsp;HPC to&nbsp;Personal Computer</h3>
+<p>To transfer a file from the&nbsp;<strong>HPC to your personal computer</strong> run the following in a terminal on your computer (<strong>not</strong> while ssh'ed into the HPC):</p>
+<p><code>scp &lt;username&gt;@login.hpc.dtu.dk:path/to/file.py path/to/file.py</code></p>
+<p>Here, <code>&lt;username&gt;</code> is your DTU user name, e.g., your study number. Type in your DTU password and the transfer will begin. The path on HPC is from your zhome folder.&nbsp;</p>
+<p><strong>Example:</strong> Transferring a file on HPC to your current folder:</p>
+<p><code>scp &lt;username&gt;@login.hpc.dtu.dk:Documents/02613_PyHPC/compute_from_hpc.py compute_from_hpc.py</code></p>
+<h2>SFTP (Terminal)</h2>
+<p>More interactive and good for transferring many files.</p>
+<p><span style="text-decoration: underline;">NOTE:</span> If you are <em>not on DTU wifi</em> you may need to connect with a VPN first or set up ssh keys (see: <a href="https://www.hpc.dtu.dk/?page_id=4317)">https://www.hpc.dtu.dk/?page_id=4317)</a>.</p>
+<h3>Connect</h3>
+<p>To connect to the transfer server, run the following in a terminal on your computer:</p>
+<p><code>sftp &lt;username&gt;@transfer.gbar.dtu.dk</code></p>
+<p>Here, <code>&lt;username&gt;</code> is your DTU user name, e.g., your study number. Type in your DTU password and you should connect. You should then see a prompt like:</p>
+<p><code>Connected to transfer.gbar.dtu.dk.<br>sftp&gt; </code></p>
+<p>You can navigate around on the HPC with <code>cd</code> and list a directory with&nbsp;<code>ls</code> like a normal ssh terminal. You can even make new directories with <code>mkdir</code>.</p>
+<p>Similarly, you can navigate around on your personal laptop with&nbsp;<code>lcd</code>, list directories with&nbsp;<code>lls</code>, and more. Notice, the commands are the same, just with an&nbsp;<code>l</code> (lowercase L for 'local') in front.</p>
+<p>A full list of commands is available in&nbsp;<code>man sftp</code> or online here&nbsp;<a href="https://man7.org/linux/man-pages/man1/sftp.1.html">https://man7.org/linux/man-pages/man1/sftp.1.html</a>.</p>
+<h3>Transfer</h3>
+<p>Once you've navigated to the correct folders, you can transfer a file from your <strong>personal computer to the HPC</strong> with:</p>
+<p><code>put file_on_personal_computer.py</code></p>
+<p>You can transfer a file from the&nbsp;<strong>HPC to your personal computer</strong> with</p>
+<p><code>get file_on_hpc.py</code></p>
+<p>SFTP also supports wildcards, e.g., you <span style="text-decoration: underline;">download all files in a directory</span> with:</p>
+<p><code>get *</code></p>
+<h2>FileZilla (GUI)</h2>
+<p>SFTP with a GUI for Windows, Mac OSX and Linux.</p>
+<h3>Connect:</h3>
+<ol>
+<li>Download and install FileZilla (<a href="https://filezilla-project.org/download.php?type=client">https://filezilla-project.org/download.php?type=client</a>).</li>
+<li>Launch FileZilla</li>
+<li>At the top fill in the following fields
+<ol>
+<li>Host: <strong>login.hpc.dtu.dk</strong></li>
+<li>Username: <strong>Your username (e.g., DTU study number)<br></strong></li>
+<li>Password: <strong>Your DTU password</strong></li>
+<li>Port: <strong>22</strong></li>
+</ol>
+</li>
+<li>Press on the button "<strong>Quickconnect</strong>".&nbsp;<span style="text-decoration: underline;">Note</span>: if you are&nbsp;<em>not on DTU wifi</em>, you may need to connect with a VPN before using FileZilla.</li>
+<li>Say that you accept all risks, and go on (save password as well if you wish).</li>
+</ol>
+<p>After this, the top should say something like:</p>
+<p><code><a target="_blank" rel="noopener noreferrer">sftp://yourUser@transfer.gbar.dtu.dk</a></code></p>
+<h3>Transfer:</h3>
+<p>The left panel shows the "Local site" i.e. the folder on your computer. The right panel shows the folder on the "Remote site", i.e. your zhome on HPC. You can navigate in both like a normal file browser.</p>
+<p>Now, simply drag and drop from left to right or vice versa. Or, right-click on a file and "upload" (from local to remote) or "download" (from remote to local). See the screenshot below for more visual guidelines:</p>
+<p><img src="pic0_20240109105850215.png" style="max-width: 100%;" data-d2l-editor-default-img-style="true"></p>
+<p></p></body></html>
