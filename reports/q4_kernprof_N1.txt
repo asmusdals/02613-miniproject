@@ -1,0 +1,24 @@
+Profiling building_id=10000
+Wrote profile results to 'q4_profile_jacobi.py.lprof'
+Timer unit: 1e-06 s
+
+Total time: 6.93582 s
+File: scripts/q4_profile_jacobi.py
+Function: jacobi at line 20
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    20                                           @profile
+    21                                           def jacobi(u, interior_mask, max_iter, atol=1e-6):
+    22         1       1817.8   1817.8      0.0      u = np.copy(u)
+    23                                           
+    24      3602       3020.5      0.8      0.0      for i in range(max_iter):
+    25      3602    4244769.6   1178.4     61.2          u_new = 0.25 * (u[1:-1, :-2] + u[1:-1, 2:] + u[:-2, 1:-1] + u[2:, 1:-1])
+    26      3602     693933.6    192.7     10.0          u_new_interior = u_new[interior_mask]
+    27      3602    1241060.7    344.5     17.9          delta = np.abs(u[1:-1, 1:-1][interior_mask] - u_new_interior).max()
+    28      3602     743454.3    206.4     10.7          u[1:-1, 1:-1][interior_mask] = u_new_interior
+    29                                           
+    30      3602       7759.6      2.2      0.1          if delta < atol:
+    31         1          1.0      1.0      0.0              break
+    32         1          2.2      2.2      0.0      return u
+
