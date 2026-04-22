@@ -4,23 +4,28 @@ Input size used for timing: N=100 floorplans
 Estimated total dataset size: 4571 floorplans
 
 a) Measured speed-up as more workers are added
-  W=1: time=100.000 s, speedup=1.000x, efficiency=100.0%
-  W=2: time=56.000 s, speedup=1.786x, efficiency=89.3%
-  W=4: time=31.000 s, speedup=3.226x, efficiency=80.6%
-  W=8: time=20.000 s, speedup=5.000x, efficiency=62.5%
+  W=1: time=1285.000 s, speedup=1.000x, efficiency=100.0%
+  W=2: time=728.000 s, speedup=1.765x, efficiency=88.3%
+  W=4: time=431.000 s, speedup=2.981x, efficiency=74.5%
+  W=8: time=333.000 s, speedup=3.859x, efficiency=48.2%
   Plot saved to reports/figures/q5_speedup.png
 
 b) Estimated parallel fraction from Amdahl's law
-  Parallel fraction p ~= 0.9147 (91.5% parallelized)
+  Slide notation:
+    S(p) = 1 / ((1 - F) + F/p) = 1 / (B + (1 - B)/p)
+    B = 1 - F
+    S(infinity) = 1 / (1 - F) = 1 / B
+  Estimated F ~= 0.8533 (85.3% parallelized)
+  Estimated B ~= 0.1467 (14.7% serial)
 
 c) Theoretical maximum speed-up and achieved fraction
-  Theoretical maximum speedup = 11.723x
-  Best observed speedup = 5.000x using 8 workers
-  Achieved 42.7% of the theoretical limit
+  Theoretical maximum speedup S(infinity) = 1/B = 6.817x
+  Best observed speedup = 3.859x using 8 workers
+  Achieved 56.6% of the theoretical limit
 
 d) Estimated runtime for all floorplans
-  Fastest measured configuration: 8 workers with 20.000 s for 100 floorplans
-  Estimated runtime for all 4571 floorplans: 15.24 min
+  Fastest measured configuration: 8 workers with 333.000 s for 100 floorplans
+  Estimated runtime for all 4571 floorplans: 4.23 h
 
 Output consistency check
   All discovered q5 CSV outputs have matching headers, row counts, and values.

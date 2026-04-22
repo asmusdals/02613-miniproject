@@ -33,8 +33,14 @@ def parse_args():
     parser.add_argument(
         "--batch-output-dir",
         type=Path,
-        default=Path("batch_output"),
+        default=Path("reports"),
         help="Directory containing HPC .out logs with timing rows.",
+    )
+    parser.add_argument(
+        "--batch-output-file",
+        type=Path,
+        default=None,
+        help="Specific HPC .out file to parse for timings. Overrides directory auto-discovery.",
     )
     parser.add_argument(
         "--timings",
@@ -123,6 +129,19 @@ def parse_batch_output_timings(batch_output_dir):
     return {workers: min(samples) for workers, samples in timings.items()}
 
 
+def parse_batch_output_file(path):
+    timings = {}
+    with path.open() as f:
+        for line in f:
+            match = TIME_ROW_PATTERN.match(line)
+            if not match:
+                continue
+            workers = int(match.group("workers"))
+            elapsed = float(match.group("elapsed"))
+            timings[workers] = elapsed
+    return timings
+
+
 def read_csv_rows(path):
     with path.open(newline="") as f:
         reader = csv.reader(f, skipinitialspace=True)
@@ -204,8 +223,9 @@ def build_analysis(runs, timings, dataset_size):
     speedups = {workers: t1 / timings[workers] for workers in workers_sorted}
     efficiencies = {workers: speedups[workers] / workers for workers in workers_sorted}
 
-    fitted_p = fit_parallel_fraction(speedups)
-    theoretical_max = math.inf if fitted_p >= 1.0 else 1.0 / (1.0 - fitted_p)
+    fitted_f = fit_parallel_fraction(speedups)
+    serial_b = 1.0 - fitted_f
+    theoretical_max = math.inf if fitted_f >= 1.0 else 1.0 / (1.0 - fitted_f)
 
     fastest_workers = min(workers_sorted, key=lambda workers: timings[workers])
     fastest_time = timings[fastest_workers]
@@ -221,7 +241,8 @@ def build_analysis(runs, timings, dataset_size):
         "timings": timings,
         "speedups": speedups,
         "efficiencies": efficiencies,
-        "parallel_fraction": fitted_p,
+        "parallel_fraction": fitted_f,
+        "serial_fraction": serial_b,
         "theoretical_max_speedup": theoretical_max,
         "fastest_workers": fastest_workers,
         "fastest_time": fastest_time,
@@ -282,14 +303,23 @@ def write_summary(analysis, validation, summary_path, plot_path):
     lines.append(f"  Plot saved to {plot_path}")
     lines.append("")
     lines.append("b) Estimated parallel fraction from Amdahl's law")
+    lines.append("  Slide notation:")
+    lines.append("    S(p) = 1 / ((1 - F) + F/p) = 1 / (B + (1 - B)/p)")
+    lines.append("    B = 1 - F")
+    lines.append("    S(infinity) = 1 / (1 - F) = 1 / B")
     lines.append(
-        f"  Parallel fraction p ~= {analysis['parallel_fraction']:.4f} "
+        f"  Estimated F ~= {analysis['parallel_fraction']:.4f} "
         f"({analysis['parallel_fraction'] * 100.0:.1f}% parallelized)"
+    )
+    lines.append(
+        f"  Estimated B ~= {analysis['serial_fraction']:.4f} "
+        f"({analysis['serial_fraction'] * 100.0:.1f}% serial)"
     )
     lines.append("")
     lines.append("c) Theoretical maximum speed-up and achieved fraction")
     lines.append(
-        f"  Theoretical maximum speedup = {analysis['theoretical_max_speedup']:.3f}x"
+        f"  Theoretical maximum speedup S(infinity) = 1/B = "
+        f"{analysis['theoretical_max_speedup']:.3f}x"
     )
     lines.append(
         f"  Best observed speedup = {analysis['achieved_max_speedup']:.3f}x "
@@ -334,6 +364,8 @@ def main():
         timings = parse_manual_timings(args.timings)
     elif args.timings_csv:
         timings = parse_timings_csv(args.timings_csv)
+    elif args.batch_output_file:
+        timings = parse_batch_output_file(args.batch_output_file)
     else:
         timings = parse_batch_output_timings(args.batch_output_dir)
 
