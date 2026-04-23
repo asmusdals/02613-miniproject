@@ -1,0 +1,4 @@
+No GPU on this node, CUDA module not loaded
+Elapsed seconds: 88 (for N=10)
+Estimated seconds for all 4571: 40224
+CSV written: results/reference_10.csv

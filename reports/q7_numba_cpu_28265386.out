@@ -1,0 +1,5 @@
+No GPU on this node, CUDA module not loaded
+Warming up Numba compilation/cache with N=1
+Elapsed seconds: 20 (for N=10, after warm-up)
+Estimated seconds for all 4571: 9142
+CSV written: results/q7_numba_cpu_N10.csv
