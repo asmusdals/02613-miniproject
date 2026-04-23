@@ -1,0 +1,6 @@
+No GPU on this node, CUDA module not loaded
+N,workers,elapsed_seconds
+100,1,1299
+100,2,705
+100,4,425
+100,8,284

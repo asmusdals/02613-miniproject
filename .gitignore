@@ -24,12 +24,5 @@ env/
 .vscode/
 .idea/
 
-# HPC / batch outputs
-*.out
-*.err
-batch_output/
-
-# Project-local generated artifacts
-data/
 
 
