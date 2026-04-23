@@ -1,0 +1,37 @@
+Q6 analysis: dynamic scheduling
+
+Input size used for timing: N=100 floorplans
+Comparison baseline: q5 static scheduling on the same N and worker counts
+
+Measured runtimes
+  W=1: static=1285 s, dynamic=1299 s
+  W=2: static=728 s, dynamic=705 s
+  W=4: static=431 s, dynamic=425 s
+  W=8: static=333 s, dynamic=284 s
+
+a) Did dynamic scheduling get faster? By how much?
+  Yes, for the parallel runs dynamic scheduling was faster than static scheduling.
+  W=2: 23 s faster, corresponding to 3.2% lower runtime.
+  W=4: 6 s faster, corresponding to 1.4% lower runtime.
+  W=8: 49 s faster, corresponding to 14.7% lower runtime.
+
+  The largest improvement was with 8 workers, where runtime decreased from
+  333 s to 284 s.
+
+b) Did the speed-up improve or worsen?
+  The speed-up improved with dynamic scheduling.
+
+  Speed-up relative to each method's own W=1 runtime:
+  W=1: static=1.000x, dynamic=1.000x
+  W=2: static=1.765x, dynamic=1.843x
+  W=4: static=2.981x, dynamic=3.056x
+  W=8: static=3.859x, dynamic=4.574x
+
+  For 8 workers, the speed-up increased from 3.859x to 4.574x, which is an
+  improvement of about 18.5%. This indicates that dynamic scheduling handled
+  the unequal convergence times between floorplans better than static scheduling.
+
+Note
+  The dynamic W=1 run was slightly slower than static W=1, 1299 s versus 1285 s.
+  This is expected because dynamic scheduling adds overhead but only helps when
+  multiple workers can rebalance uneven floorplan runtimes.
