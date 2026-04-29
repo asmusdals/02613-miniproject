@@ -1,6 +1,5 @@
 import argparse
 import csv
-import math
 import os
 import re
 import tempfile
@@ -115,7 +114,7 @@ def parse_batch_output_timings(batch_output_dir):
     if not batch_output_dir.exists():
         return timings
 
-    for path in sorted(batch_output_dir.glob("*.out")):
+    for path in sorted(batch_output_dir.glob("q5_static_*.out")):
         with path.open() as f:
             for line in f:
                 match = TIME_ROW_PATTERN.match(line)
@@ -175,25 +174,6 @@ def validate_outputs(runs):
     }
 
 
-def amdahl_speedup(parallel_fraction, workers):
-    return 1.0 / ((1.0 - parallel_fraction) + parallel_fraction / workers)
-
-
-def fit_parallel_fraction(observed_speedups):
-    best_p = 0.0
-    best_error = float("inf")
-    for i in range(10001):
-        p = i / 10000.0
-        error = 0.0
-        for workers, speedup in observed_speedups.items():
-            model = amdahl_speedup(p, workers)
-            error += (model - speedup) ** 2
-        if error < best_error:
-            best_error = error
-            best_p = p
-    return best_p
-
-
 def format_duration(seconds):
     minutes = seconds / 60.0
     hours = minutes / 60.0
@@ -223,16 +203,20 @@ def build_analysis(runs, timings, dataset_size):
     speedups = {workers: t1 / timings[workers] for workers in workers_sorted}
     efficiencies = {workers: speedups[workers] / workers for workers in workers_sorted}
 
-    fitted_f = fit_parallel_fraction(speedups)
-    serial_b = 1.0 - fitted_f
-    theoretical_max = math.inf if fitted_f >= 1.0 else 1.0 / (1.0 - fitted_f)
-
     fastest_workers = min(workers_sorted, key=lambda workers: timings[workers])
     fastest_time = timings[fastest_workers]
     achieved_max_speedup = speedups[fastest_workers]
-    achieved_fraction = (
-        achieved_max_speedup / theoretical_max if math.isfinite(theoretical_max) else 1.0
-    )
+    parallel_fraction = None
+    theoretical_max_speedup = None
+    achieved_fraction_of_theoretical = None
+    if fastest_workers > 1 and achieved_max_speedup > 1.0:
+        parallel_fraction = (1.0 - 1.0 / achieved_max_speedup) / (
+            1.0 - 1.0 / fastest_workers
+        )
+        theoretical_max_speedup = 1.0 / (1.0 - parallel_fraction)
+        achieved_fraction_of_theoretical = (
+            achieved_max_speedup / theoretical_max_speedup
+        )
     estimated_full_runtime = fastest_time * (dataset_size / n)
 
     return {
@@ -241,13 +225,12 @@ def build_analysis(runs, timings, dataset_size):
         "timings": timings,
         "speedups": speedups,
         "efficiencies": efficiencies,
-        "parallel_fraction": fitted_f,
-        "serial_fraction": serial_b,
-        "theoretical_max_speedup": theoretical_max,
         "fastest_workers": fastest_workers,
         "fastest_time": fastest_time,
         "achieved_max_speedup": achieved_max_speedup,
-        "achieved_fraction_of_theoretical": achieved_fraction,
+        "parallel_fraction": parallel_fraction,
+        "theoretical_max_speedup": theoretical_max_speedup,
+        "achieved_fraction_of_theoretical": achieved_fraction_of_theoretical,
         "estimated_full_runtime": estimated_full_runtime,
         "dataset_size": dataset_size,
     }
@@ -257,23 +240,12 @@ def make_plot(analysis, plot_path):
     workers = analysis["workers_sorted"]
     observed = [analysis["speedups"][worker] for worker in workers]
     ideal = workers
-    p = analysis["parallel_fraction"]
-
-    fitted_workers = list(range(1, max(workers) + 1))
-    fitted_curve = [amdahl_speedup(p, worker) for worker in fitted_workers]
 
     plot_path.parent.mkdir(parents=True, exist_ok=True)
 
     plt.figure(figsize=(7, 4.5))
     plt.plot(workers, observed, marker="o", linewidth=2, label="Observed speedup")
     plt.plot(workers, ideal, linestyle="--", linewidth=1.5, label="Ideal linear speedup")
-    plt.plot(
-        fitted_workers,
-        fitted_curve,
-        linestyle=":",
-        linewidth=2,
-        label=f"Amdahl fit (p={p:.3f})",
-    )
     plt.xlabel("Workers")
     plt.ylabel("Speedup relative to 1 worker")
     plt.title(f"Q5 Static Scheduling Speedup (N={analysis['n']})")
@@ -303,32 +275,31 @@ def write_summary(analysis, validation, summary_path, plot_path):
     lines.append(f"  Plot saved to {plot_path}")
     lines.append("")
     lines.append("b) Estimated parallel fraction from Amdahl's law")
-    lines.append("  Slide notation:")
-    lines.append("    S(p) = 1 / ((1 - F) + F/p) = 1 / (B + (1 - B)/p)")
-    lines.append("    B = 1 - F")
-    lines.append("    S(infinity) = 1 / (1 - F) = 1 / B")
-    lines.append(
-        f"  Estimated F ~= {analysis['parallel_fraction']:.4f} "
-        f"({analysis['parallel_fraction'] * 100.0:.1f}% parallelized)"
-    )
-    lines.append(
-        f"  Estimated B ~= {analysis['serial_fraction']:.4f} "
-        f"({analysis['serial_fraction'] * 100.0:.1f}% serial)"
-    )
+    if analysis["parallel_fraction"] is None:
+        lines.append("  Could not estimate parallel fraction from the available timings.")
+    else:
+        lines.append("  Using the best observed speedup and Amdahl's law:")
+        lines.append("    F = (1 - 1/S(p)) / (1 - 1/p)")
+        lines.append(
+            f"  With p={analysis['fastest_workers']} and S(p)={analysis['achieved_max_speedup']:.3f}, "
+            f"the estimated parallel fraction is F={analysis['parallel_fraction']:.4f}"
+        )
     lines.append("")
     lines.append("c) Theoretical maximum speed-up and achieved fraction")
-    lines.append(
-        f"  Theoretical maximum speedup S(infinity) = 1/B = "
-        f"{analysis['theoretical_max_speedup']:.3f}x"
-    )
     lines.append(
         f"  Best observed speedup = {analysis['achieved_max_speedup']:.3f}x "
         f"using {analysis['fastest_workers']} workers"
     )
-    lines.append(
-        f"  Achieved {analysis['achieved_fraction_of_theoretical'] * 100.0:.1f}% "
-        f"of the theoretical limit"
-    )
+    if analysis["theoretical_max_speedup"] is None:
+        lines.append("  Could not estimate the theoretical maximum speedup.")
+    else:
+        lines.append(
+            f"  Theoretical maximum speedup = {analysis['theoretical_max_speedup']:.3f}x"
+        )
+        lines.append(
+            f"  Achieved {analysis['achieved_fraction_of_theoretical'] * 100.0:.1f}% "
+            f"of the theoretical limit"
+        )
     lines.append("")
     lines.append("d) Estimated runtime for all floorplans")
     lines.append(

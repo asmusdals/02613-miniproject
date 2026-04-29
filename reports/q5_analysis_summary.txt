@@ -11,17 +11,14 @@ a) Measured speed-up as more workers are added
   Plot saved to reports/figures/q5_speedup.png
 
 b) Estimated parallel fraction from Amdahl's law
-  Slide notation:
-    S(p) = 1 / ((1 - F) + F/p) = 1 / (B + (1 - B)/p)
-    B = 1 - F
-    S(infinity) = 1 / (1 - F) = 1 / B
-  Estimated F ~= 0.8533 (85.3% parallelized)
-  Estimated B ~= 0.1467 (14.7% serial)
+  Using the best observed speedup and Amdahl's law:
+    F = (1 - 1/S(p)) / (1 - 1/p)
+  With p=8 and S(p)=3.859, the estimated parallel fraction is F=0.8467
 
 c) Theoretical maximum speed-up and achieved fraction
-  Theoretical maximum speedup S(infinity) = 1/B = 6.817x
   Best observed speedup = 3.859x using 8 workers
-  Achieved 56.6% of the theoretical limit
+  Theoretical maximum speedup = 6.523x
+  Achieved 59.2% of the theoretical limit
 
 d) Estimated runtime for all floorplans
   Fastest measured configuration: 8 workers with 333.000 s for 100 floorplans
