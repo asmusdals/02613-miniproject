@@ -9,7 +9,7 @@
 #BSUB -M 8GB
 #BSUB -o batch_output/q10_nsys_profile_%J.out
 #BSUB -e batch_output/q10_nsys_profile_%J.err
-#BSUB -u s224473@student.dtu.dk
+#BSUB -u s216137@student.dtu.dk
 #BSUB -B
 #BSUB -N
 

@@ -9,7 +9,7 @@
 #BSUB -M 4GB
 #BSUB -o batch_output/q11_numba_parallel_%J.out
 #BSUB -e batch_output/q11_numba_parallel_%J.err
-#BSUB -u s224473@student.dtu.dk
+#BSUB -u s216137@student.dtu.dk
 #BSUB -B
 #BSUB -N
 
