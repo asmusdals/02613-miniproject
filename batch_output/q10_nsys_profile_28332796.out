@@ -1,0 +1,4 @@
+Warming up CuPy with N=1
+Running nsys profile on q9_cupy (naive) with N=10
+nsys profile written: reports/q10_nsys_q9.nsys-rep
+Text stats written:   reports/q10_nsys_q9_stats.txt

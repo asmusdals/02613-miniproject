@@ -1,10 +1,9 @@
 #!/bin/bash
 
 #BSUB -J q9_cupy
-#BSUB -q gpua100
+#BSUB -q c02613
 #BSUB -n 4
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 01:00
 #BSUB -R "rusage[mem=4GB]"
 #BSUB -M 4GB
 #BSUB -o batch_output/q9_cupy_%J.out

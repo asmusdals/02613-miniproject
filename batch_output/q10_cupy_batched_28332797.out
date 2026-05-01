@@ -1,0 +1,4 @@
+Warming up CuPy/CUDA with N=1
+Elapsed seconds: 12 (for N=10, after warm-up)
+Estimated seconds for all 4571: 5485
+CSV written: results/q10_cupy_batched_N10.csv

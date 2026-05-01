@@ -1,0 +1,20 @@
+No GPU on this node, CUDA module not loaded
+Warming up Numba JIT with N=1
+Elapsed seconds: 1505 (N=4571, W=8)
+CSV written: results/q12_all_N4571_W8.csv
+
+Running Q12 analysis...
+Q12 analysis — all floorplans
+
+Total buildings processed: 4571
+
+a) Distribution of mean temperatures
+   Histogram saved to: reports/figures/q12_hist_mean_temp.png
+
+b) Average mean temperature across all buildings: 14.6936 °C
+
+c) Average temperature standard deviation:        6.8017 °C
+
+d) Buildings with >= 50% area above 18°C: 804 / 4571 (17.6%)
+
+e) Buildings with >= 50% area below 15°C: 2471 / 4571 (54.1%)

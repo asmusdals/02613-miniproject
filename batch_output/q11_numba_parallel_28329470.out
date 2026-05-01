@@ -1,0 +1,9 @@
+No GPU on this node, CUDA module not loaded
+N,workers,elapsed_seconds
+100,1,224
+100,2,111
+100,4,59
+100,8,35
+
+Best run (W=8): 35 seconds for N=100
+Estimated seconds for all 4571: 1599

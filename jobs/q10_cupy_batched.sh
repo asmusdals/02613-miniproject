@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #BSUB -J q10_cupy_batched
-#BSUB -q gpua100
+#BSUB -q c02613
 #BSUB -n 4
 #BSUB -gpu "num=1:mode=exclusive_process"
 #BSUB -W 01:00

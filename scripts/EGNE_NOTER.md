@@ -159,3 +159,24 @@ scp s224473@login.hpc.dtu.dk:Documents/02613/miniproject/results/q12_all_N4571_W
 # The analysis summary + all 4 histogram PNGs
 scp s224473@login.hpc.dtu.dk:Documents/02613/miniproject/reports/q12_analysis_summary.txt reports/
 scp "s224473@login.hpc.dtu.dk:Documents/02613/miniproject
+
+
+
+
+
+
+
+
+
+
+Batch job notes: 
+
+q8 -> Job <28329456> is submitted to queue <gpua100>.
+q9 -> Job <28329460> is submitted to queue <gpua100>.
+q10_a -> Job <28329463> is submitted to queue <gpua100>.
+q10_b -> waiting on q10_a (bsub < jobs/q10_cupy_batched.sh)
+q11 -> Job <28329470> is submitted to queue <hpc>.
+q12 -> Job <28329485> is submitted to queue <hpc>.
+
+
+scp -r s216137@login.hpc.dtu.dk:Documents/02613/miniproject/{batch_output,reports,results} .

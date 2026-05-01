@@ -1,0 +1,4 @@
+Warming up CUDA JIT compilation with N=1
+Elapsed seconds: 10 (for N=10, after warm-up)
+Estimated seconds for all 4571: 4571
+CSV written: results/q8_cuda_N10.csv

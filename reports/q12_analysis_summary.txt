@@ -1,0 +1,14 @@
+Q12 analysis — all floorplans
+
+Total buildings processed: 4571
+
+a) Distribution of mean temperatures
+   Histogram saved to: reports/figures/q12_hist_mean_temp.png
+
+b) Average mean temperature across all buildings: 14.6936 °C
+
+c) Average temperature standard deviation:        6.8017 °C
+
+d) Buildings with >= 50% area above 18°C: 804 / 4571 (17.6%)
+
+e) Buildings with >= 50% area below 15°C: 2471 / 4571 (54.1%)
