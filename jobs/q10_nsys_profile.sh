@@ -1,10 +1,9 @@
 #!/bin/bash
 
 #BSUB -J q10_nsys_profile
-#BSUB -q gpua100
+#BSUB -q c02613
 #BSUB -n 4
 #BSUB -gpu "num=1:mode=exclusive_process"
-#BSUB -W 01:00
 #BSUB -R "rusage[mem=8GB]"
 #BSUB -M 8GB
 #BSUB -o batch_output/q10_nsys_profile_%J.out
